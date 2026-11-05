@@ -1,5 +1,6 @@
 using BaobabEngine.Graphics;
 using Foster.Framework;
+using System;
 using System.Numerics;
 
 namespace UntitledGame;
@@ -8,7 +9,7 @@ public class Entity
 {
     protected Sprite Sprite;
 
-    public Vector2 Position;
+    protected Vector2 Position;
 
     protected int MaxHealth;
     protected int CurrentHealth;
@@ -23,6 +24,16 @@ public class Entity
     }
 
     public void Draw(Batcher batcher) => Sprite.Draw(batcher, Position);
+
+    public void Update(Grid grid, Input input)
+    {
+        Position = grid.GetGlobalPositionFromGrid(this);
+
+        if (input.Keyboard.Pressed(Keys.P))
+        {
+            Console.WriteLine($"X: {Position.X}\nY: {Position.Y}\n");
+        }
+    }
 
     public void TakeDamage(int damage)
     {

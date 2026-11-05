@@ -10,13 +10,13 @@ game.Run();
 
 public sealed class Game : App
 {
-    private Grid _grid;
+    private readonly Grid _grid;
 
-    private Entity _player;
+    private readonly Entity _player;
 
-    private AtlasGenerator _atlas;
+    private readonly AtlasGenerator _atlas;
 
-    private Batcher _batcher;
+    private readonly Batcher _batcher;
 
     public Game() : base(new AppConfig
     {
@@ -37,7 +37,7 @@ public sealed class Game : App
 
         _batcher = new Batcher(GraphicsDevice);
 
-        _grid = new Grid(new IntVector2(3, 5));
+        _grid = new Grid(new IntVector2(3, 5), Window);
 
         Sprite playerSprite = new Sprite(_atlas.GetTexture("tempAsset"), 0.5f);
         _player = new Entity(
@@ -49,7 +49,7 @@ public sealed class Game : App
 
     protected override void Startup()
     {
-        _grid.SubscribeEntity(_player, new IntVector2(1, 5));
+        _grid.SubscribeEntity(_player, new IntVector2(1, 3));
     }
     
     protected override void Shutdown()
@@ -61,6 +61,9 @@ public sealed class Game : App
     {
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
+
+        
+        _player.Update(_grid, Input);
     }
 
     protected override void Render()

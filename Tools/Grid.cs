@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Foster.Framework;
 
 namespace UntitledGame;
 
@@ -27,12 +28,15 @@ public sealed class Grid
 
     public Vector2 CellSize { get; private set; }
 
-    public Grid(IntVector2 gridSize)
+    public Grid(IntVector2 gridSize, Window gameWindow)
     {
         _container = new Entity[gridSize.X, gridSize.Y];
         _subscribedEntities = new Dictionary<Entity, IntVector2>();
 
-        CellSize = new Vector2(10, 10);
+        CellSize = new Vector2(
+            gameWindow.WidthInPixels / gridSize.X,
+            gameWindow.HeightInPixels / gridSize.Y
+        );
     }
 
     public void SubscribeEntity(Entity entity, IntVector2 cell)
@@ -99,6 +103,6 @@ public sealed class Grid
         var globalCellTopLeftX = cell.X * CellSize.X;
         var globalCellTopLeftY = cell.Y * CellSize.Y;
 
-        return new Vector2(globalCellTopLeftX, globalCellTopLeftY) + halfCellSize;
+        return new Vector2(globalCellTopLeftX + halfCellSize.X, globalCellTopLeftY + halfCellSize.Y);
     }
 }
