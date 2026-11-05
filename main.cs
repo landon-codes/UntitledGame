@@ -47,7 +47,10 @@ public sealed class Game : App
         );
     }
 
-    protected override void Startup() { }
+    protected override void Startup()
+    {
+        _grid.SubscribeEntity(_player, new IntVector2(1, 5));
+    }
     
     protected override void Shutdown()
     {

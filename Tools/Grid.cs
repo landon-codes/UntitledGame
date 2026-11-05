@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace UntitledGame;
 
@@ -24,10 +25,14 @@ public sealed class Grid
     private readonly Entity?[,] _container;
     private readonly Dictionary<Entity, IntVector2> _subscribedEntities;
 
+    public Vector2 CellSize { get; private set; }
+
     public Grid(IntVector2 gridSize)
     {
         _container = new Entity[gridSize.X, gridSize.Y];
         _subscribedEntities = new Dictionary<Entity, IntVector2>();
+
+        CellSize = new Vector2(10, 10);
     }
 
     public void SubscribeEntity(Entity entity, IntVector2 cell)
@@ -82,5 +87,18 @@ public sealed class Grid
             throw new OverflowException($"A movement of {direction} would cause the entity to go out of bounds of the grid from {_subscribedEntities[entity]}.");
 
         _subscribedEntities[entity] = newPosition;
+    }
+
+    public Vector2 GetGlobalPositionFromGrid(Entity entity)
+    {
+        if (!_subscribedEntities.TryGetValue(entity, out var cell))
+            throw new KeyNotFoundException("The entity given was not subscribed to the list.");
+
+        var halfCellSize = CellSize * 0.5f;
+
+        var globalCellTopLeftX = cell.X * CellSize.X;
+        var globalCellTopLeftY = cell.Y * CellSize.Y;
+
+        return new Vector2(globalCellTopLeftX, globalCellTopLeftY) + halfCellSize;
     }
 }

@@ -8,7 +8,7 @@ public class Entity
 {
     protected Sprite Sprite;
 
-    protected Vector2 Position;
+    public Vector2 Position;
 
     protected int MaxHealth;
     protected int CurrentHealth;
