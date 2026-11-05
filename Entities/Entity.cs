@@ -25,28 +25,9 @@ public class Entity
 
     public void Draw(Batcher batcher) => Sprite.Draw(batcher, Position);
 
-    public void Update(Grid grid, Input input)
+    public void Update(Grid grid)
     {
         Position = grid.GetGlobalPositionFromGrid(this);
-
-        if (input.Keyboard.Pressed(Keys.P))
-        {
-            Console.WriteLine($"Global X: {Position.X}\nGlobal Y: {Position.Y}\n");
-            
-            var gridPosition = grid.GetGridPosition(this);
-            Console.WriteLine($"Local X: {gridPosition.X}\nLocal Y: {gridPosition.Y}\n");
-        }
-
-        var currentGridPosition = grid.GetGridPosition(this);
-
-        if (input.Keyboard.Pressed(Keys.Up) && grid.IsCellInGrid(currentGridPosition + IntVector2.Up))
-        {
-            grid.MoveEntity(this, IntVector2.Up);
-        }
-        if (input.Keyboard.Pressed(Keys.Down) && grid.IsCellInGrid(currentGridPosition + IntVector2.Down))
-        {
-            grid.MoveEntity(this, new IntVector2(0,1));
-        }
     }
 
     public void TakeDamage(int damage)

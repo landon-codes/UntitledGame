@@ -62,7 +62,7 @@ public sealed class Game : App
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
         
-        _player.Update(_grid, Input);
+        _player.Update(_grid);
     }
 
     protected override void Render()
