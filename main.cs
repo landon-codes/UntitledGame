@@ -61,7 +61,6 @@ public sealed class Game : App
     {
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
-
         
         _player.Update(_grid, Input);
     }

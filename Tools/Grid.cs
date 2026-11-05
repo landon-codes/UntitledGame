@@ -10,6 +10,11 @@ public struct IntVector2(int x, int y)
     public int X = x;
     public int Y = y;
 
+    public static IntVector2 Up => new(0, -1);
+    public static IntVector2 Down => new(0, 1);
+    public static IntVector2 Left => new(-1,0);
+    public static IntVector2 Right => new(1,0);
+
     public static IntVector2 operator +(IntVector2 a, IntVector2 b) =>
         new IntVector2(b.X + a.X, b.Y + a.Y);
     
@@ -23,6 +28,12 @@ public struct IntVector2(int x, int y)
 
 public sealed class Grid
 {
+    public class CellOccupiedException : Exception
+    {
+        public CellOccupiedException() { }
+        public CellOccupiedException(string message) : base(message) { }
+    }
+
     private readonly Entity?[,] _container;
     private readonly Dictionary<Entity, IntVector2> _subscribedEntities;
 
@@ -39,12 +50,21 @@ public sealed class Grid
         );
     }
 
+    public bool IsCellInGrid(IntVector2 cell)
+    {
+        return (
+            cell.X >= 0 &&
+            cell.Y >= 0 &&
+            cell.X < _container.GetLength(0) &&
+            cell.Y < _container.GetLength(1)
+        );
+    }
+
     public void SubscribeEntity(Entity entity, IntVector2 cell)
     {
         try
         {
             _subscribedEntities.Add(entity, cell);
-            _container[cell.X, cell.Y] = entity;
         }
         catch (ArgumentException err)
         {
@@ -63,15 +83,6 @@ public sealed class Grid
         try
         {
             _subscribedEntities.Remove(entity);
-            
-            for (int y = 0; y < _container.GetLength(0); y++)
-                for (int x = 0; x < _container.GetLength(1); x++)
-                {
-                    var currentEntity = _container[y, x];
-
-                    if (currentEntity == entity)
-                        _container[y, x] = null;
-                }
         }
         catch (Exception err)
         {
@@ -88,7 +99,10 @@ public sealed class Grid
         var newPosition = _subscribedEntities[entity] + direction;
 
         if (newPosition.X >= _container.GetLength(0) || newPosition.Y >= _container.GetLength(1))
-            throw new OverflowException($"A movement of {direction} would cause the entity to go out of bounds of the grid from {_subscribedEntities[entity]}.");
+            throw new ArgumentException($"A movement of {direction} would cause the entity to go out of bounds of the grid from {_subscribedEntities[entity]}.");
+
+        if (_container[newPosition.X, newPosition.Y] != null)
+            throw new CellOccupiedException("An entity was moved into a cell that is already occupied.");
 
         _subscribedEntities[entity] = newPosition;
     }
@@ -104,5 +118,13 @@ public sealed class Grid
         var globalCellTopLeftY = cell.Y * CellSize.Y;
 
         return new Vector2(globalCellTopLeftX + halfCellSize.X, globalCellTopLeftY + halfCellSize.Y);
+    }
+
+    public IntVector2 GetGridPosition(Entity entity)
+    {
+        if (!_subscribedEntities.TryGetValue(entity, out var cell))
+            throw new KeyNotFoundException("The entity given was not subscribed to the list.");
+
+        return cell;
     }
 }
