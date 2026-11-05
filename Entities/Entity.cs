@@ -23,4 +23,11 @@ public class Entity
     }
 
     public void Draw(Batcher batcher) => Sprite.Draw(batcher, Position);
+
+    public void TakeDamage(int damage)
+    {
+        CurrentHealth -= damage;
+    }
+
+    public bool IsDead() => CurrentHealth <= 0;
 }
