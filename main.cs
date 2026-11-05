@@ -2,6 +2,8 @@ using Foster.Framework;
 using BaobabEngine.Graphics;
 using UntitledGame;
 using System.Numerics;
+using System;
+using BaobabEngine.Collisions;
 
 Game game = new();
 game.Run();
@@ -13,6 +15,8 @@ public sealed class Game : App
     private Entity _player;
 
     private AtlasGenerator _atlas;
+
+    private Batcher _batcher;
 
     public Game() : base(new AppConfig
     {
@@ -31,23 +35,38 @@ public sealed class Game : App
             "tempAsset.png"
         ]);
 
+        _batcher = new Batcher(GraphicsDevice);
+
         _grid = new Grid(new IntVector2(3, 5));
 
+        Sprite playerSprite = new Sprite(_atlas.GetTexture("tempAsset"), 0.5f);
         _player = new Entity(
-            new Sprite(
-                _atlas.GetTexture("tempAsset"),
-                2
-            ),
-            new Vector2(windowSize.X * 0.5f, windowSize.Y * (2f/3f)),
+            playerSprite,
+            new Vector2(windowSize.X * 0.5f, windowSize.Y - (playerSprite.Height * 0.5f)),
             3
         );
     }
 
     protected override void Startup() { }
     
-    protected override void Shutdown() { }
+    protected override void Shutdown()
+    {
+        Console.WriteLine("The game has closed successfully.");
+    }
 
-    protected override void Update() { }
+    protected override void Update()
+    {
+        if (Input.Keyboard.Pressed(Keys.Escape))
+            Exit();
+    }
 
-    protected override void Render() { }
+    protected override void Render()
+    {
+        Window.Clear(Color.White);
+
+        _player.Draw(_batcher);
+
+        _batcher.Render(Window);
+        _batcher.Clear();
+    }
 }
