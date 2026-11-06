@@ -18,7 +18,9 @@ public sealed class Game : App
 
     private readonly Batcher _batcher;
 
-    private readonly List<Entity> _enemies;
+    private List<Entity> _enemies;
+
+    private string _turn = "player";
 
     public Game() : base(new AppConfig
     {
@@ -63,7 +65,7 @@ public sealed class Game : App
             while (true)
             {
                 var x = random.Next(0, 2);
-                var y = random.Next(0, 4);
+                var y = random.Next(0, 3);
                 IntVector2 entityPosition = new(x,y);
 
                 if (!_grid.CellOccupied(entityPosition))
@@ -95,10 +97,18 @@ public sealed class Game : App
     {
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
-        
-        _player.Update(_grid);
 
-        foreach (var enemy in _enemies) enemy.Update(_grid);
+        if (_turn == "player")
+        {
+            _player.Update(_grid);
+
+            if (Input.Keyboard.Pressed(Keys.Space)) _turn = "enemies";
+        }
+        else if (_turn == "enemies")
+        {
+            UpdateEnemies();
+            _turn = "player";
+        }
     }
 
     protected override void Render()
@@ -111,5 +121,32 @@ public sealed class Game : App
 
         _batcher.Render(Window);
         _batcher.Clear();
+    }
+
+    private void UpdateEnemies()
+    {
+        // Moves the entities down
+        List<Entity> newEnemies = [.. _enemies];
+        foreach (var enemy in _enemies)
+        {
+            var enemyPosition = _grid.GetGridPosition(enemy);
+
+            if (enemyPosition.Y >= 4)
+            {
+                _grid.UnsubscribeEntity(enemy);
+
+                newEnemies.Remove(enemy);
+                _player.TakeDamage(1);
+                
+                continue;
+            }
+
+            if (_grid.CellOccupied(enemyPosition + IntVector2.Down)) continue;
+
+            _grid.MoveEntity(enemy, IntVector2.Down);
+        }
+        _enemies = newEnemies;
+
+        foreach (var enemy in _enemies) enemy.Update(_grid);
     }
 }
