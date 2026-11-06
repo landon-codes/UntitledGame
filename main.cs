@@ -4,9 +4,25 @@ using UntitledGame;
 using System.Numerics;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.ComponentModel;
 
 Game game = new();
 game.Run();
+
+struct GameEndData
+{
+    public bool GameOver = false;
+    public string Message = "";
+
+    public GameEndData() {}
+
+    public GameEndData(bool gameOver, string message)
+    {
+        GameOver = gameOver;
+        Message = message;
+    }
+}
 
 public sealed class Game : App
 {
@@ -21,6 +37,14 @@ public sealed class Game : App
     private List<Entity> _enemies;
 
     private string _turn = "player";
+
+    private GameEndData _gameOver = new();
+    
+    private SpriteFont _font;
+
+    private const string GameOverMessage = "Odysseus died...";
+
+    private readonly float _gameOverMessageWidth;
 
     public Game() : base(new AppConfig
     {
@@ -45,11 +69,14 @@ public sealed class Game : App
 
         _grid = new Grid(new IntVector2(3, 5), Window);
 
+        _font = new SpriteFont(GraphicsDevice, Path.Combine("Assets", "Lorem-Demo.ttf"), 20);
+        _gameOverMessageWidth = _font.WidthOf(GameOverMessage);
+
         Sprite playerSprite = new Sprite(_atlas.GetTexture("tempAsset"), 0.5f);
         _player = new Entity(
             playerSprite,
             new Vector2(windowSize.X * 0.5f, windowSize.Y - (playerSprite.Height * 0.5f)),
-            3
+            maxHealth: 4
         );
     }
 
@@ -71,6 +98,8 @@ public sealed class Game : App
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
 
+        if (_gameOver.GameOver) return;
+
         if (_turn == "player")
         {
             _player.Update(_grid);
@@ -82,6 +111,12 @@ public sealed class Game : App
             UpdateEnemies();
             _turn = "player";
         }
+
+        if (_player.IsDead())
+        {
+            _gameOver.GameOver = true;
+            _gameOver.Message = GameOverMessage;
+        }
     }
 
     protected override void Render()
@@ -91,6 +126,19 @@ public sealed class Game : App
         _player.Draw(_batcher);
 
         foreach (var enemy in _enemies) enemy.Draw(_batcher);
+
+        if (_gameOver.GameOver)
+        {
+            _font.Draw(
+                _batcher, 
+                GameOverMessage, 
+                new Vector2 (
+                    (Window.WidthInPixels * 0.5f) - (0.5f * _gameOverMessageWidth),
+                    Window.HeightInPixels * 0.5f
+                ),
+                Color.Black
+            );
+        }
 
         _batcher.Render(Window);
         _batcher.Clear();
