@@ -98,7 +98,12 @@ public sealed class Game : App
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
 
-        if (_gameOver.GameOver) return;
+        if (_gameOver.GameOver)
+        {
+            // TODO: Make a restort button
+
+            return;
+        }
 
         if (_turn == "player")
         {
@@ -155,12 +160,16 @@ public sealed class Game : App
             var enemyPosition = _grid.GetGridPosition(enemy);
             var playerPosition = _grid.GetGridPosition(_player);
 
-            if (enemyPosition.Y >= 4 || (enemyPosition + IntVector2.Down) == playerPosition)
+            bool collidingWithPlayer = (enemyPosition + IntVector2.Down) == playerPosition;
+
+            if (collidingWithPlayer)
+                _player.TakeDamage(1);
+
+            if (enemyPosition.Y >= 4 || collidingWithPlayer)
             {
                 _grid.UnsubscribeEntity(enemy);
 
                 newEnemies.Remove(enemy);
-                _player.TakeDamage(1);
 
                 entitiesRemoved++;
                 
