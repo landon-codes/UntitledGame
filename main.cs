@@ -3,7 +3,7 @@ using BaobabEngine.Graphics;
 using UntitledGame;
 using System.Numerics;
 using System;
-using BaobabEngine.Collisions;
+using System.Collections.Generic;
 
 Game game = new();
 game.Run();
@@ -17,6 +17,8 @@ public sealed class Game : App
     private readonly AtlasGenerator _atlas;
 
     private readonly Batcher _batcher;
+
+    private readonly List<Entity> _enemies;
 
     public Game() : base(new AppConfig
     {
@@ -37,6 +39,8 @@ public sealed class Game : App
 
         _batcher = new Batcher(GraphicsDevice);
 
+        _enemies = new List<Entity>();
+
         _grid = new Grid(new IntVector2(3, 5), Window);
 
         Sprite playerSprite = new Sprite(_atlas.GetTexture("tempAsset"), 0.5f);
@@ -49,7 +53,37 @@ public sealed class Game : App
 
     protected override void Startup()
     {
+        Random random = new Random();
+
         _grid.SubscribeEntity(_player, new IntVector2(1, 3));
+
+        // Make two enemies
+        for (int times = 0; times < 2; times++)
+        {
+            while (true)
+            {
+                var x = random.Next(0, 2);
+                var y = random.Next(0, 4);
+                IntVector2 entityPosition = new(x,y);
+
+                if (!_grid.CellOccupied(entityPosition))
+                {
+                    Entity enemy = new(
+                        new Sprite(
+                            _atlas.GetTexture("tempAsset"),
+                            0.5f
+                        ),
+                        _grid.GetGlobalPositionFromGrid(entityPosition),
+                        1
+                    );
+
+                    _enemies.Add(enemy);
+                    _grid.SubscribeEntity(enemy, entityPosition);
+
+                    break;
+                }
+            }
+        }
     }
     
     protected override void Shutdown()
@@ -63,6 +97,8 @@ public sealed class Game : App
             Exit();
         
         _player.Update(_grid);
+
+        foreach (var enemy in _enemies) enemy.Update(_grid);
     }
 
     protected override void Render()
@@ -70,6 +106,8 @@ public sealed class Game : App
         Window.Clear(Color.White);
 
         _player.Draw(_batcher);
+
+        foreach (var enemy in _enemies) enemy.Draw(_batcher);
 
         _batcher.Render(Window);
         _batcher.Clear();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using Foster.Framework;
 
 namespace UntitledGame;
@@ -65,6 +66,11 @@ public sealed class Grid
         try
         {
             _subscribedEntities.Add(entity, cell);
+            
+            if (CellOccupied(cell))
+                throw new CellOccupiedException("Cannot subscribe an entity to a cell that is already occupied.");
+
+            _container[cell.X, cell.Y] = entity;
         }
         catch (ArgumentException err)
         {
@@ -83,6 +89,15 @@ public sealed class Grid
         try
         {
             _subscribedEntities.Remove(entity);
+            
+            for (int y = 0; y < _container.GetLength(0); y++)
+            {
+                for (int x = 0; x < _container.GetLength(1); x++)
+                {
+                    if (_container[y,x] == entity)
+                        _container[y,x] = null;
+                }
+            }
         }
         catch (Exception err)
         {
@@ -96,7 +111,8 @@ public sealed class Grid
         if (!_subscribedEntities.ContainsKey(entity))
             throw new KeyNotFoundException($"Entity given to move is not contained in the grid.");
         
-        var newPosition = _subscribedEntities[entity] + direction;
+        var oldPosition = _subscribedEntities[entity];
+        var newPosition = oldPosition + direction;
 
         if (newPosition.X >= _container.GetLength(0) || newPosition.Y >= _container.GetLength(1))
             throw new ArgumentException($"A movement of {direction} would cause the entity to go out of bounds of the grid from {_subscribedEntities[entity]}.");
@@ -104,7 +120,9 @@ public sealed class Grid
         if (_container[newPosition.X, newPosition.Y] != null)
             throw new CellOccupiedException("An entity was moved into a cell that is already occupied.");
 
+        _container[oldPosition.X, oldPosition.Y] = null;
         _subscribedEntities[entity] = newPosition;
+        _container[newPosition.X, newPosition.Y] = entity;
     }
 
     public Vector2 GetGlobalPositionFromGrid(Entity entity)
@@ -112,6 +130,11 @@ public sealed class Grid
         if (!_subscribedEntities.TryGetValue(entity, out var cell))
             throw new KeyNotFoundException("The entity given was not subscribed to the list.");
 
+        return GetGlobalPositionFromGrid(cell);
+    }
+
+    public Vector2 GetGlobalPositionFromGrid(IntVector2 cell)
+    {
         var halfCellSize = CellSize * 0.5f;
 
         var globalCellTopLeftX = cell.X * CellSize.X;
@@ -126,5 +149,10 @@ public sealed class Grid
             throw new KeyNotFoundException("The entity given was not subscribed to the list.");
 
         return cell;
+    }
+
+    public bool CellOccupied(IntVector2 cell)
+    {
+        return _container[cell.X, cell.Y] != null;
     }
 }
