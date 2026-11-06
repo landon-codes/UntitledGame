@@ -23,8 +23,33 @@ public struct IntVector2(int x, int y)
     public static IntVector2 operator -(IntVector2 a, IntVector2 b) =>
         new IntVector2(b.X - a.X, b.Y - a.Y);
 
-    public static implicit operator String(IntVector2 vector) =>
+    public static implicit operator string(IntVector2 vector) =>
         $"[{vector.X}, {vector.Y}]";
+
+    public static bool operator ==(IntVector2 a, IntVector2 b)
+    {
+        return (
+            a.X == b.X &&
+            a.Y == b.Y
+        );
+    }
+
+    public static bool operator !=(IntVector2 a, IntVector2 b)
+    {
+        return !(a==b);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (!(obj is IntVector2)) return false;
+
+        return (IntVector2)obj == this;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }
 
 public sealed class Grid

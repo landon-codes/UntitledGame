@@ -55,37 +55,10 @@ public sealed class Game : App
 
     protected override void Startup()
     {
-        Random random = new Random();
-
         _grid.SubscribeEntity(_player, new IntVector2(1, 3));
 
-        // Make two enemies
-        for (int times = 0; times < 2; times++)
-        {
-            while (true)
-            {
-                var x = random.Next(0, 2);
-                var y = random.Next(0, 3);
-                IntVector2 entityPosition = new(x,y);
-
-                if (!_grid.CellOccupied(entityPosition))
-                {
-                    Entity enemy = new(
-                        new Sprite(
-                            _atlas.GetTexture("tempAsset"),
-                            0.5f
-                        ),
-                        _grid.GetGlobalPositionFromGrid(entityPosition),
-                        1
-                    );
-
-                    _enemies.Add(enemy);
-                    _grid.SubscribeEntity(enemy, entityPosition);
-
-                    break;
-                }
-            }
-        }
+        GenerateEnemy();
+        GenerateEnemy();
     }
     
     protected override void Shutdown()
@@ -125,18 +98,23 @@ public sealed class Game : App
 
     private void UpdateEnemies()
     {
+        int entitiesRemoved = 0;
+
         // Moves the entities down
         List<Entity> newEnemies = [.. _enemies];
         foreach (var enemy in _enemies)
         {
             var enemyPosition = _grid.GetGridPosition(enemy);
+            var playerPosition = _grid.GetGridPosition(_player);
 
-            if (enemyPosition.Y >= 4)
+            if (enemyPosition.Y >= 4 || (enemyPosition + IntVector2.Down) == playerPosition)
             {
                 _grid.UnsubscribeEntity(enemy);
 
                 newEnemies.Remove(enemy);
                 _player.TakeDamage(1);
+
+                entitiesRemoved++;
                 
                 continue;
             }
@@ -147,6 +125,37 @@ public sealed class Game : App
         }
         _enemies = newEnemies;
 
+        for (int i = 0; i < entitiesRemoved; i++) GenerateEnemy();
+
         foreach (var enemy in _enemies) enemy.Update(_grid);
+    }
+
+    private void GenerateEnemy()
+    {
+        Random random = new Random();
+
+        while (true)
+        {
+            var x = random.Next(0, 2);
+            var y = 0;
+            IntVector2 entityPosition = new(x,y);
+
+            if (!_grid.CellOccupied(entityPosition))
+            {
+                Entity enemy = new(
+                    new Sprite(
+                        _atlas.GetTexture("tempAsset"),
+                        0.5f
+                    ),
+                    _grid.GetGlobalPositionFromGrid(entityPosition),
+                    1
+                );
+
+                _enemies.Add(enemy);
+                _grid.SubscribeEntity(enemy, entityPosition);
+
+                break;
+            }
+        }
     }
 }
