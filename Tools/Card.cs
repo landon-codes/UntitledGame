@@ -77,16 +77,17 @@ public class StrategicRetreatCard : ICard
 			var playerPosition = _grid.GetGridPosition(_player);
 			IntVector2 newPosition = playerPosition + (IntVector2)MovementDirection;
 
-			if (_grid.CellOccupied(newPosition))
-			{
-				Console.Error.WriteLine("Moving the player was skipped because the cell they wanted to move to was occupied.");
-				return;
-			}
 			if (!_grid.IsCellInGrid(newPosition))
 			{
 				Console.Error.WriteLine("The player was not moved because they requested to move off the grid.");
 				return;
 			}
+			if (_grid.CellOccupied(newPosition))
+			{
+				Console.Error.WriteLine("Moving the player was skipped because the cell they wanted to move to was occupied.");
+				return;
+			}
+			
 
 			_grid.MoveEntity(_player, (IntVector2)MovementDirection);
 		}
