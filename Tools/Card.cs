@@ -10,7 +10,7 @@ public interface ICard
 	// The action the card does when used.
 	public void Action();
 
-	public void Draw(Batcher batcher);
+	public void Draw(Batcher batcher);	
 }
 
 public class StrategicRetreatCard : ICard
@@ -87,67 +87,68 @@ public class StrategicRetreatCard : ICard
 		}
 	}	
 
-	public class SurpriseAttackCard : ICard
+	
+}
+
+public class SurpriseAttackCard : ICard
+{
+	public readonly struct Config(Sprite cardSprite, Vector2 cardPosition, Grid grid, Entity player, Game gameInstance)
 	{
+		public readonly Sprite Sprite = cardSprite;
+		public readonly Vector2 Position = cardPosition;
+		public readonly Grid Grid = grid;
+		public readonly Entity Player = player;
 
-		public readonly struct Config(Sprite cardSprite, Vector2 cardPosition, Grid grid, Entity player, Game gameInstance)
+		public readonly Game GameInstance = gameInstance;
+	}
+
+	private readonly Grid _grid;
+	private readonly Entity _player;
+
+	private readonly Sprite _sprite;
+	private readonly Vector2 _position;
+
+	private readonly Game _game;
+
+	public SurpriseAttackCard(Config cardConfig)
+	{
+		_sprite = cardConfig.Sprite;
+		_position = cardConfig.Position;
+
+		_grid = cardConfig.Grid;
+		_player = cardConfig.Player;
+
+		_game = cardConfig.GameInstance;
+	}
+
+	public void Draw(Batcher batcher)
+	{
+		_sprite.Draw(batcher, _position);
+	}		
+
+	// Removes the entity above the player if it exists.
+	public void Action()
+	{
+		try
 		{
-			public readonly Sprite Sprite = cardSprite;
-			public readonly Vector2 Position = cardPosition;
-			public readonly Grid Grid = grid;
-			public readonly Entity Player = player;
+			var playerPosition = _grid.GetGridPosition(_player);
+			var positionAbovePlayer = playerPosition + IntVector2.Up;
 
-			public readonly Game GameInstance = gameInstance;
-		}
-
-		private readonly Grid _grid;
-		private readonly Entity _player;
-
-		private readonly Sprite _sprite;
-		private readonly Vector2 _position;
-
-		private readonly Game _game;
-
-		public SurpriseAttackCard(Config cardConfig)
-		{
-			_sprite = cardConfig.Sprite;
-			_position = cardConfig.Position;
-
-			_grid = cardConfig.Grid;
-			_player = cardConfig.Player;
-
-			_game = cardConfig.GameInstance;
-		}
-
-		public void Draw(Batcher batcher)
-		{
-			_sprite.Draw(batcher, _position);
-		}		
-
-		// Removes the entity above the player if it exists.
-		public void Action()
-		{
-			try
+			if (!_grid.IsCellInGrid(positionAbovePlayer))
 			{
-				var playerPosition = _grid.GetGridPosition(_player);
-				var positionAbovePlayer = playerPosition + IntVector2.Up;
-
-				if (!_grid.IsCellInGrid(positionAbovePlayer))
-				{
-					Console.Error.WriteLine("The position above the player was not on the grid.\nAborting `SurpriseAttackCard` action.");
-					return;
-				}				
-		
-				var entity = _grid.GetEntity(positionAbovePlayer);
-				if (entity is null) return;
-
-				_game.RemoveEntity(entity);					
-			}
-			catch (System.Collections.Generic.KeyNotFoundException)
-			{
-				Console.Error.WriteLine("The player appears to not have been subscribed before running a `SurpriseAttackCard`.\nThe action is being aborted.");
+				Console.Error.WriteLine("The position above the player was not on the grid.\nAborting `SurpriseAttackCard` action.");
 				return;
-			}
+			}				
+	
+			var entity = _grid.GetEntity(positionAbovePlayer);
+			if (entity is null) return;
+
+			_game.RemoveEntity(entity);					
+		}
+		catch (System.Collections.Generic.KeyNotFoundException)
+		{
+			Console.Error.WriteLine("The player appears to not have been subscribed before running a `SurpriseAttackCard`.\nThe action is being aborted.");
+			return;
 		}
 	}
 }
