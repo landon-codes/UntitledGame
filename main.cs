@@ -45,6 +45,8 @@ public sealed class Game : App
 
     private readonly float _gameOverMessageWidth;
 
+    private ICard[]? _cards;
+
     public Game() : base(new AppConfig
     {
         ApplicationName = "AccEngII Final Project",
@@ -59,7 +61,9 @@ public sealed class Game : App
         var windowSize = Window.SizeInPixels;
 
         _atlas = new AtlasGenerator("Assets", GraphicsDevice, [
-            "tempAsset.png"
+            "tempAsset.png",
+            "tempAsset2.png",
+            "tempAsset3.png"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -77,6 +81,8 @@ public sealed class Game : App
             new Vector2(windowSize.X * 0.5f, windowSize.Y - (playerSprite.Height * 0.5f)),
             maxHealth: 4
         );
+
+        _cards = GenerateCards();
     }
 
     protected override void Startup()
@@ -106,14 +112,30 @@ public sealed class Game : App
 
         if (_turn == "player")
         {
-            _player.Update(_grid);
+            if (_cards is null)
+            {
+                Console.Error.WriteLine("The cards were null when the player's turn arrived.");
+            }
+            else
+            {
+                foreach (var card in _cards)
+                {
+                    if (!card.IsClicked()) continue;
 
-            if (Input.Keyboard.Pressed(Keys.Space)) _turn = "enemies";
+                    card.Action();
+                    _turn = "enemies";
+                    _cards = null;
+                }
+            }
+
+            _player.Update(_grid);          
         }
         else if (_turn == "enemies")
         {
             UpdateEnemies();
+
             _turn = "player";
+            _cards = GenerateCards();
         }
 
         if (_player.IsDead())
@@ -142,6 +164,12 @@ public sealed class Game : App
                 ),
                 Color.Black
             );
+        }
+
+        if (!(_cards is null))
+        {
+            foreach (var card in _cards)
+                card.Draw(_batcher);
         }
 
         _batcher.Render(Window);
@@ -226,5 +254,72 @@ public sealed class Game : App
         {
             Console.Error.WriteLine("An entity was trying to be removed from the grid when they were not subscribed.");
         }
+    }
+
+    private ICard[] GenerateCards()
+    {
+        ICard[] cards = new ICard[3];
+
+        string[] cardTypes = {
+            "surprise attack",
+            "strategic retreat"
+        };
+        
+        for (int i = 0; i < cards.Length; i++)
+        {
+            Random random = new();
+            var cardType = cardTypes[random.Next(0, cardTypes.Length)];
+            
+            Vector2 cardPosition = new(
+                (Window.WidthInPixels / cards.Length) * i,
+                Window.Height * (3/4)
+            );
+
+            switch(cardType)
+            {
+                case "surprise attack":
+                    Sprite surpriseAttackSprite = new(
+                        _atlas.GetTexture("tempAsset3"),
+                        3
+                    );
+                
+                    SurpriseAttackCard.Config surpriseCardConfig = new(
+                        cardSprite: surpriseAttackSprite,
+                        cardPosition: cardPosition,
+                        grid: _grid,
+                        player: _player,
+                        gameInstance: this
+                    );
+                    cards[i] = new SurpriseAttackCard(surpriseCardConfig);
+
+                    break;
+
+                case "strategic retreat":
+                    Sprite strategicRetreatSprite = new(
+                        _atlas.GetTexture("tempAsset2"),
+                        3
+                    );
+                    
+                    IntVector2[] movementDirections = {
+                        IntVector2.Left,
+                        IntVector2.Right
+                    };
+                    var movementDirection = movementDirections[random.Next(0, movementDirections.Length)];
+                
+                    StrategicRetreatCard.Config retreatCardConfig = new(
+                        sprite: strategicRetreatSprite,
+                        position: cardPosition,
+                        grid: _grid,
+                        player: _player,
+                        gameInput: Input,
+                        movementDirection: movementDirection
+                    );
+                    cards[i] = new StrategicRetreatCard(retreatCardConfig);
+
+                    break;
+            }
+        }
+
+        return cards;
     }
 }
