@@ -224,7 +224,7 @@ public sealed class Game : App
 
         while (true)
         {
-            var x = random.Next(0, 2);
+            var x = random.Next(0, 3);
             var y = 0;
             IntVector2 entityPosition = new(x,y);
 
