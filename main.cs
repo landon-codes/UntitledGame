@@ -276,11 +276,16 @@ public sealed class Game : App
         {
             Random random = new();
             var cardType = cardTypes[random.Next(0, cardTypes.Length)];
-            
-            Vector2 cardPosition = new(
-                (Window.WidthInPixels / cards.Length) * i,
-                Window.Height * (3/4)
-            );
+
+            Vector2 GetCardPosition(float spriteWidth, float spriteHeight)
+            {
+                Vector2 cardPosition = new(
+                    (Window.WidthInPixels / cards.Length) * i + 2 * (spriteWidth * 0.5f),
+                    (spriteHeight * 0.5f)
+                );
+
+                return cardPosition; 
+            }
 
             switch(cardType)
             {
@@ -292,7 +297,7 @@ public sealed class Game : App
                 
                     SurpriseAttackCard.Config surpriseCardConfig = new(
                         cardSprite: surpriseAttackSprite,
-                        cardPosition: cardPosition,
+                        cardPosition: GetCardPosition(surpriseAttackSprite.Width, surpriseAttackSprite.Height),
                         grid: _grid,
                         player: _player,
                         gameInstance: this
@@ -315,7 +320,7 @@ public sealed class Game : App
                 
                     StrategicRetreatCard.Config retreatCardConfig = new(
                         sprite: strategicRetreatSprite,
-                        position: cardPosition,
+                        position: GetCardPosition(strategicRetreatSprite.Width, strategicRetreatSprite.Height),
                         grid: _grid,
                         player: _player,
                         gameInput: Input,
