@@ -25,9 +25,10 @@ public class BundledSprite : Sprite
 
 	public BundledSprite(Subtexture frontTexture,
 		Subtexture backTexture,
-		float spriteScale = 1f) : base()
+		float spriteScale = 1f,
+		bool rotate90Degrees = false) : base()
 	{
-		FrontSprite = new Sprite(frontTexture, spriteScale);
+		FrontSprite = new Sprite(frontTexture, spriteScale, (rotate90Degrees) ?  0.5f * System.MathF.PI : 0f);
 		BackSprite = new Sprite(backTexture, spriteScale);
 	}
 

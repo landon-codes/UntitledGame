@@ -66,7 +66,8 @@ public sealed class Game : App
             "CardBack.aseprite",
             "StrategicRetreatSprite.aseprite",
             "SurpriseAttack.aseprite",
-            "tempAsset.png"
+            "tempAsset.png",
+            "Arrow.png"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -310,9 +311,10 @@ public sealed class Game : App
 
                 case "strategic retreat":
                     BundledSprite strategicRetreatSprite = new(
-                        frontTexture: _atlas.GetTexture("StrategicRetreatSprite"),
+                        frontTexture: _atlas.GetTexture("Arrow"),
                         backTexture: _atlas.GetTexture("CardBack"),
-                        spriteScale: 3
+                        spriteScale: 3,
+                        rotate90Degrees: true
                     );
                     
                     IntVector2[] movementDirections = {
