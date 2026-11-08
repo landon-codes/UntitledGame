@@ -67,7 +67,8 @@ public sealed class Game : App
             "StrategicRetreatSprite.aseprite",
             "SurpriseAttack.aseprite",
             "tempAsset.png",
-            "Arrow.png"
+            "Arrow.png",
+            "Sword.png"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -293,7 +294,7 @@ public sealed class Game : App
             {
                 case "surprise attack":
                     BundledSprite surpriseAttackSprite = new(
-                        frontTexture: _atlas.GetTexture("SurpriseAttack"),
+                        frontTexture: _atlas.GetTexture("Sword"),
                         backTexture: _atlas.GetTexture("CardBack"),
                         spriteScale: 3
                     );
