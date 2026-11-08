@@ -47,6 +47,8 @@ public sealed class Game : App
 
     private ICard[]? _cards;
 
+    private int _enemiesToAdd = 0;
+
     public Game() : base(new AppConfig
     {
         ApplicationName = "AccEngII Final Project",
@@ -209,7 +211,8 @@ public sealed class Game : App
         }
         _enemies = newEnemies;
 
-        for (int i = 0; i < entitiesRemoved; i++) GenerateEnemy();
+        for (int i = 0; i < entitiesRemoved + _enemiesToAdd; i++) GenerateEnemy();
+        _enemiesToAdd = 0;
 
         foreach (var enemy in _enemies) enemy.Update(_grid);
     }
@@ -244,16 +247,20 @@ public sealed class Game : App
     }
 
     public void RemoveEntity(Entity entity)
-    {
+    {        
         try
-        {
+        {            
             _grid.UnsubscribeEntity(entity);
             _enemies.Remove(entity);
+
+            if (entity != _player)
+                _enemiesToAdd++;
         }
         catch (KeyNotFoundException)
         {
             Console.Error.WriteLine("An entity was trying to be removed from the grid when they were not subscribed.");
         }
+
     }
 
     private ICard[] GenerateCards()
