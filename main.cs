@@ -5,7 +5,6 @@ using System.Numerics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.ComponentModel;
 
 Game game = new();
 game.Run();
@@ -213,6 +212,19 @@ public sealed class Game : App
 
                 break;
             }
+        }
+    }
+
+    public void RemoveEntity(Entity entity)
+    {
+        try
+        {
+            _grid.UnsubscribeEntity(entity);
+            _enemies.Remove(entity);
+        }
+        catch (KeyNotFoundException)
+        {
+            Console.Error.WriteLine("An entity was trying to be removed from the grid when they were not subscribed.");
         }
     }
 }
