@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
 using Foster.Framework;
 
 namespace UntitledGame;
@@ -110,25 +109,17 @@ public sealed class Grid
     }
 
     public void UnsubscribeEntity(Entity entity)
-    {
-        try
+    {        
+        _subscribedEntities.Remove(entity);
+        
+        for (int y = 0; y < _container.GetLength(0); y++)
         {
-            _subscribedEntities.Remove(entity);
-            
-            for (int y = 0; y < _container.GetLength(0); y++)
+            for (int x = 0; x < _container.GetLength(1); x++)
             {
-                for (int x = 0; x < _container.GetLength(1); x++)
-                {
-                    if (_container[y,x] == entity)
-                        _container[y,x] = null;
-                }
+                if (_container[y,x] == entity)
+                    _container[y,x] = null;
             }
-        }
-        catch (Exception err)
-        {
-            Console.Error.WriteLine("An unknown exception occured while trying to unsubscribe an entity from the grid:");
-            Console.Error.WriteLine(err);
-        }
+        }        
     }
 
     public void MoveEntity(Entity entity, IntVector2 direction)
@@ -179,5 +170,10 @@ public sealed class Grid
     public bool CellOccupied(IntVector2 cell)
     {
         return _container[cell.X, cell.Y] != null;
+    }
+
+    public Entity? GetEntity(IntVector2 position)
+    {
+        return _container[position.X, position.Y];
     }
 }
