@@ -28,12 +28,14 @@ public class StrategicRetreatCard : ICard
 	// Stores the direction the player will be moved.
 	public readonly IntVector2? MovementDirection;
 
+	private SpriteFont _font;
+
 	public readonly struct Config (
 		BundledSprite sprite,
 		Vector2 position,
 		Grid grid,
 		Entity player,
-		Input gameInput,
+		Game gameInstance,
 		IntVector2? movementDirection = null		
 	)
 	{
@@ -42,7 +44,7 @@ public class StrategicRetreatCard : ICard
 		public readonly Grid Grid = grid;
 		public readonly Entity Player = player;
 		public readonly IntVector2? MovementDirection = movementDirection;
-		public readonly Input GameInput = gameInput;
+		public readonly Game GameInstance = gameInstance;
 	}
 
 	public StrategicRetreatCard(Config cardConfig)
@@ -55,7 +57,9 @@ public class StrategicRetreatCard : ICard
 
 		MovementDirection = cardConfig.MovementDirection;
 
-		_gameInput = cardConfig.GameInput;
+		_gameInput = cardConfig.GameInstance.Input;
+
+		_font = new SpriteFont(cardConfig.GameInstance.GraphicsDevice, System.IO.Path.Combine("Assets", "Lorem-Demo.ttf"), 10f);
 	}
 
 	public void Draw(Batcher batcher)
@@ -82,6 +86,18 @@ public class StrategicRetreatCard : ICard
 				_position
 			)
 		);
+
+		const string text = "Strategic\n Retreat";
+		var textWidth = _font.WidthOf(text);
+		var textHeight = _font.HeightOf(text);
+
+		_font.DrawWrapped(batcher, text, new Vector2 (
+			_position.X - (textWidth * 0.5f),
+			_position.Y + textHeight
+		),
+		Vector2.Zero,
+		_sprite.BackSprite.Width,
+		Color.Black);
 	}
 
 	public void Action()
@@ -188,8 +204,7 @@ public class SurpriseAttackCard : ICard
 		),
 		Vector2.Zero,
 		_sprite.BackSprite.Width,
-		Color.Black);
-		
+		Color.Black);		
 	}		
 
 	// Removes the entity above the player if it exists.

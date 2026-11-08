@@ -329,7 +329,7 @@ public sealed class Game : App
                         position: GetCardPosition(strategicRetreatSprite.Width, strategicRetreatSprite.Height),
                         grid: _grid,
                         player: _player,
-                        gameInput: Input,
+                        gameInstance: this,
                         movementDirection: movementDirection
                     );
                     cards[i] = new StrategicRetreatCard(retreatCardConfig);
