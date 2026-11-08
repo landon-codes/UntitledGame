@@ -1,4 +1,5 @@
 using BaobabEngine.Graphics;
+using BaobabEngine.Collisions;
 using Foster.Framework;
 using System;
 using System.Numerics;
@@ -11,6 +12,8 @@ public interface ICard
 	public void Action();
 
 	public void Draw(Batcher batcher);	
+
+	public bool IsClicked();
 }
 
 public class StrategicRetreatCard : ICard
@@ -20,6 +23,8 @@ public class StrategicRetreatCard : ICard
 
 	private readonly Grid _grid;
 	private readonly Entity _player;
+
+	private readonly Input _gameInput;
 	
 	// Stores the direction the player will be moved.
 	public readonly IntVector2? MovementDirection;
@@ -29,7 +34,8 @@ public class StrategicRetreatCard : ICard
 		Vector2 position,
 		Grid grid,
 		Entity player,
-		IntVector2? movementDirection = null
+		Input gameInput,
+		IntVector2? movementDirection = null		
 	)
 	{
 		public readonly Sprite CardSprite = sprite;
@@ -37,6 +43,7 @@ public class StrategicRetreatCard : ICard
 		public readonly Grid Grid = grid;
 		public readonly Entity Player = player;
 		public readonly IntVector2? MovementDirection = movementDirection;
+		public readonly Input GameInput = gameInput;
 	}
 
 	public StrategicRetreatCard(Config cardConfig)
@@ -48,6 +55,8 @@ public class StrategicRetreatCard : ICard
 		_player = cardConfig.Player;
 
 		MovementDirection = cardConfig.MovementDirection;
+
+		_gameInput = cardConfig.GameInput;
 	}
 
 	public void Draw(Batcher batcher)
@@ -87,7 +96,19 @@ public class StrategicRetreatCard : ICard
 		}
 	}	
 
-	
+	public bool IsClicked()
+	{
+		BoundingBox cardBounds = new BoundingBox(_sprite, _position);
+
+		Vector2 mousePosition = new(_gameInput.Mouse.X, _gameInput.Mouse.Y);
+		BoundingBox mouseBounds = new(
+			mousePosition,
+			width: 1,
+			height: 1
+		);
+
+		return (mouseBounds.Intersects(cardBounds) && _gameInput.Mouse.Pressed(MouseButtons.Left));
+	}
 }
 
 public class SurpriseAttackCard : ICard
@@ -150,5 +171,19 @@ public class SurpriseAttackCard : ICard
 			Console.Error.WriteLine("The player appears to not have been subscribed before running a `SurpriseAttackCard`.\nThe action is being aborted.");
 			return;
 		}
+	}
+
+	public bool IsClicked()
+	{
+		BoundingBox cardBounds = new(_sprite, _position);
+
+		Vector2 mousePosition = new(_game.Input.Mouse.X, _game.Input.Mouse.Y);
+		BoundingBox mouseBounds = new(
+			mousePosition,
+			width: 1,
+			height: 1
+		);
+
+		return (mouseBounds.Intersects(cardBounds) && _game.Input.Mouse.Pressed(MouseButtons.Left));
 	}
 }
