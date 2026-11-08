@@ -152,6 +152,8 @@ public class SurpriseAttackCard : ICard
 
 	private readonly Game _game;
 
+	private SpriteFont _font;
+
 	public SurpriseAttackCard(Config cardConfig)
 	{
 		_sprite = cardConfig.Sprite;
@@ -161,6 +163,8 @@ public class SurpriseAttackCard : ICard
 		_player = cardConfig.Player;
 
 		_game = cardConfig.GameInstance;
+
+		_font = new(_game.GraphicsDevice, System.IO.Path.Combine("Assets", "Lorem-Demo.ttf"), 10f);
 	}
 
 	public void Draw(Batcher batcher)
@@ -173,6 +177,19 @@ public class SurpriseAttackCard : ICard
 				_position
 			)
 		);
+
+		const string text = "Surprise\nAttack";
+		var textWidth = _font.WidthOf(text);
+		var textHeight = _font.HeightOf(text);
+
+		_font.DrawWrapped(batcher, text, new Vector2(
+			_position.X - (textWidth * 0.5f),
+			_position.Y + textHeight
+		),
+		Vector2.Zero,
+		_sprite.BackSprite.Width,
+		Color.Black);
+		
 	}		
 
 	// Removes the entity above the player if it exists.
