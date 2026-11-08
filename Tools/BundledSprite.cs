@@ -14,27 +14,32 @@ public class BundledSprite : Sprite
 		public readonly bool MirrorX = mirrorX;
 		public readonly bool MirrorY = mirrorY;
 	}
+
+	public new float Width => BackSprite.Width;
+	public new float Height => BackSprite.Height;
+
+	public new Sprite Texture => BackSprite;
 	
-	private Sprite _frontSprite;
-	private Sprite _backSprite;
+	public Sprite FrontSprite;
+	public Sprite BackSprite;
 
 	public BundledSprite(Subtexture frontTexture,
 		Subtexture backTexture,
 		float spriteScale = 1f) : base()
 	{
-		_frontSprite = new Sprite(frontTexture, spriteScale);
-		_backSprite = new Sprite(backTexture, spriteScale);
+		FrontSprite = new Sprite(frontTexture, spriteScale);
+		BackSprite = new Sprite(backTexture, spriteScale);
 	}
 
 	public void Draw(in Batcher batcher, DrawArguments frontSpriteArguments, DrawArguments backSpriteArguments)
 	{
-		_backSprite.Draw(batcher,
+		BackSprite.Draw(batcher,
 			backSpriteArguments.Position,
 			backSpriteArguments.Origin,
 			backSpriteArguments.MirrorX,
 			backSpriteArguments.MirrorY);
 
-		_frontSprite.Draw(batcher,
+		FrontSprite.Draw(batcher,
 			frontSpriteArguments.Position,
 			frontSpriteArguments.Origin,
 			frontSpriteArguments.MirrorX,

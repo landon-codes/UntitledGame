@@ -118,7 +118,7 @@ public class StrategicRetreatCard : ICard
 
 	public bool IsClicked()
 	{
-		BoundingBox cardBounds = new BoundingBox(_sprite, _position);
+		BoundingBox cardBounds = new BoundingBox(_sprite.BackSprite, _position);
 
 		Vector2 mousePosition = new(_gameInput.Mouse.X, _gameInput.Mouse.Y);
 		BoundingBox mouseBounds = new(
@@ -202,7 +202,7 @@ public class SurpriseAttackCard : ICard
 
 	public bool IsClicked()
 	{
-		BoundingBox cardBounds = new(_sprite, _position);
+		BoundingBox cardBounds = new(_sprite.BackSprite, _position);
 
 		Vector2 mousePosition = new(_game.Input.Mouse.X, _game.Input.Mouse.Y);
 		BoundingBox mouseBounds = new(

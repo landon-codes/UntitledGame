@@ -63,9 +63,10 @@ public sealed class Game : App
         var windowSize = Window.SizeInPixels;
 
         _atlas = new AtlasGenerator("Assets", GraphicsDevice, [
-            "tempAsset.png",
-            "tempAsset2.png",
-            "tempAsset3.png"
+            "CardBack.aseprite",
+            "StrategicRetreatSprite.aseprite",
+            "SurpriseAttack.aseprite",
+            "tempAsset.png"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -290,9 +291,10 @@ public sealed class Game : App
             switch(cardType)
             {
                 case "surprise attack":
-                    Sprite surpriseAttackSprite = new(
-                        _atlas.GetTexture("tempAsset3"),
-                        3
+                    BundledSprite surpriseAttackSprite = new(
+                        frontTexture: _atlas.GetTexture("SurpriseAttack"),
+                        backTexture: _atlas.GetTexture("CardBack"),
+                        spriteScale: 3
                     );
                 
                     SurpriseAttackCard.Config surpriseCardConfig = new(
@@ -307,9 +309,10 @@ public sealed class Game : App
                     break;
 
                 case "strategic retreat":
-                    Sprite strategicRetreatSprite = new(
-                        _atlas.GetTexture("tempAsset2"),
-                        3
+                    BundledSprite strategicRetreatSprite = new(
+                        frontTexture: _atlas.GetTexture("StrategicRetreatSprite"),
+                        backTexture: _atlas.GetTexture("CardBack"),
+                        spriteScale: 3
                     );
                     
                     IntVector2[] movementDirections = {
