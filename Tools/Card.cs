@@ -1,4 +1,3 @@
-using BaobabEngine.Graphics;
 using BaobabEngine.Collisions;
 using Foster.Framework;
 using System;
@@ -18,7 +17,7 @@ public interface ICard
 
 public class StrategicRetreatCard : ICard
 {
-	private readonly Sprite _sprite;
+	private readonly BundledSprite _sprite;
 	private readonly Vector2 _position;
 
 	private readonly Grid _grid;
@@ -30,7 +29,7 @@ public class StrategicRetreatCard : ICard
 	public readonly IntVector2? MovementDirection;
 
 	public readonly struct Config (
-		Sprite sprite,
+		BundledSprite sprite,
 		Vector2 position,
 		Grid grid,
 		Entity player,
@@ -38,7 +37,7 @@ public class StrategicRetreatCard : ICard
 		IntVector2? movementDirection = null		
 	)
 	{
-		public readonly Sprite CardSprite = sprite;
+		public readonly BundledSprite CardSprite = sprite;
 		public readonly Vector2 CardPosition = position;
 		public readonly Grid Grid = grid;
 		public readonly Entity Player = player;
@@ -61,7 +60,27 @@ public class StrategicRetreatCard : ICard
 
 	public void Draw(Batcher batcher)
 	{
-		_sprite.Draw(batcher, _position);
+		bool mirrorX = false;
+		
+		// Makes sure the sprite matches the direction
+		if (!(MovementDirection is null))
+		{
+			IntVector2 notNullMovementDirection = (IntVector2)MovementDirection;
+
+			if (notNullMovementDirection.X == 1)
+				mirrorX = true;
+		}
+
+		_sprite.Draw(batcher,
+			frontSpriteArguments: new BundledSprite.DrawArguments(
+				_position
+			),
+			backSpriteArguments: new BundledSprite.DrawArguments(
+				_position,
+				BaobabEngine.Graphics.Sprite.DrawPosition.Centered,
+				mirrorX
+			)
+		);
 	}
 
 	public void Action()
@@ -114,9 +133,9 @@ public class StrategicRetreatCard : ICard
 
 public class SurpriseAttackCard : ICard
 {
-	public readonly struct Config(Sprite cardSprite, Vector2 cardPosition, Grid grid, Entity player, Game gameInstance)
+	public readonly struct Config(BundledSprite cardSprite, Vector2 cardPosition, Grid grid, Entity player, Game gameInstance)
 	{
-		public readonly Sprite Sprite = cardSprite;
+		public readonly BundledSprite Sprite = cardSprite;
 		public readonly Vector2 Position = cardPosition;
 		public readonly Grid Grid = grid;
 		public readonly Entity Player = player;
@@ -127,7 +146,7 @@ public class SurpriseAttackCard : ICard
 	private readonly Grid _grid;
 	private readonly Entity _player;
 
-	private readonly Sprite _sprite;
+	private readonly BundledSprite _sprite;
 	private readonly Vector2 _position;
 
 	private readonly Game _game;
@@ -145,7 +164,14 @@ public class SurpriseAttackCard : ICard
 
 	public void Draw(Batcher batcher)
 	{
-		_sprite.Draw(batcher, _position);
+		_sprite.Draw(batcher,
+			frontSpriteArguments: new BundledSprite.DrawArguments(
+				_position
+			),
+			backSpriteArguments: new BundledSprite.DrawArguments(
+				_position
+			)
+		);
 	}		
 
 	// Removes the entity above the player if it exists.
