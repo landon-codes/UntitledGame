@@ -171,4 +171,9 @@ public sealed class Grid
     {
         return _container[cell.X, cell.Y] != null;
     }
+
+    public Entity? GetEntity(IntVector2 position)
+    {
+        return _container[position.X, position.Y];
+    }
 }
