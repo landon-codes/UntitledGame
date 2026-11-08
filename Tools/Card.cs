@@ -63,7 +63,7 @@ public class StrategicRetreatCard : ICard
 		bool mirrorX = false;
 		
 		// Makes sure the sprite matches the direction
-		if (!(MovementDirection is null))
+		if (!(MovementDirection == null))
 		{
 			IntVector2 notNullMovementDirection = (IntVector2)MovementDirection;
 
@@ -73,12 +73,12 @@ public class StrategicRetreatCard : ICard
 
 		_sprite.Draw(batcher,
 			frontSpriteArguments: new BundledSprite.DrawArguments(
-				_position
-			),
-			backSpriteArguments: new BundledSprite.DrawArguments(
 				_position,
 				BaobabEngine.Graphics.Sprite.DrawPosition.Centered,
 				mirrorX
+			),
+			backSpriteArguments: new BundledSprite.DrawArguments(
+				_position
 			)
 		);
 	}
