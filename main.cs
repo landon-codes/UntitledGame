@@ -49,6 +49,10 @@ public sealed class Game : App
 
     private int _enemiesToAdd = 0;
 
+    private readonly Vector2 _windowCenter;
+
+    private Sprite _background;
+
     public Game() : base(new AppConfig
     {
         ApplicationName = "AccEngII Final Project",
@@ -62,6 +66,8 @@ public sealed class Game : App
     {
         var windowSize = Window.SizeInPixels;
 
+        _windowCenter = new Vector2(windowSize.X * 0.5f, windowSize.Y * 0.5f);
+
         _atlas = new AtlasGenerator("Assets", GraphicsDevice, [
             "CardBack.aseprite",
             "StrategicRetreatSprite.aseprite",
@@ -71,9 +77,12 @@ public sealed class Game : App
             "Odysseus.aseprite",
             "Spider.png",
             "Cyclopse.png",
-            "Octopus.png"
+            "Octopus.png",
+            "background.png"
         ]);
 
+        _background = new Sprite(_atlas.GetTexture("background"), 3f);
+        
         _batcher = new Batcher(GraphicsDevice);
 
         _enemies = new List<Entity>();
@@ -156,6 +165,8 @@ public sealed class Game : App
     protected override void Render()
     {
         Window.Clear(Color.White);
+
+        _background.Draw(_batcher, _windowCenter);
 
         _player.Draw(_batcher);
 
