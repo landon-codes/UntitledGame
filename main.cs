@@ -63,9 +63,12 @@ public sealed class Game : App
         var windowSize = Window.SizeInPixels;
 
         _atlas = new AtlasGenerator("Assets", GraphicsDevice, [
+            "CardBack.aseprite",
+            "StrategicRetreatSprite.aseprite",
+            "SurpriseAttack.aseprite",
             "tempAsset.png",
-            "tempAsset2.png",
-            "tempAsset3.png"
+            "Arrow.png",
+            "Sword.png"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -223,7 +226,7 @@ public sealed class Game : App
 
         while (true)
         {
-            var x = random.Next(0, 2);
+            var x = random.Next(0, 3);
             var y = 0;
             IntVector2 entityPosition = new(x,y);
 
@@ -290,9 +293,10 @@ public sealed class Game : App
             switch(cardType)
             {
                 case "surprise attack":
-                    Sprite surpriseAttackSprite = new(
-                        _atlas.GetTexture("tempAsset3"),
-                        3
+                    BundledSprite surpriseAttackSprite = new(
+                        frontTexture: _atlas.GetTexture("Sword"),
+                        backTexture: _atlas.GetTexture("CardBack"),
+                        spriteScale: 3
                     );
                 
                     SurpriseAttackCard.Config surpriseCardConfig = new(
@@ -307,9 +311,11 @@ public sealed class Game : App
                     break;
 
                 case "strategic retreat":
-                    Sprite strategicRetreatSprite = new(
-                        _atlas.GetTexture("tempAsset2"),
-                        3
+                    BundledSprite strategicRetreatSprite = new(
+                        frontTexture: _atlas.GetTexture("Arrow"),
+                        backTexture: _atlas.GetTexture("CardBack"),
+                        spriteScale: 3,
+                        rotate90Degrees: true
                     );
                     
                     IntVector2[] movementDirections = {
@@ -323,7 +329,7 @@ public sealed class Game : App
                         position: GetCardPosition(strategicRetreatSprite.Width, strategicRetreatSprite.Height),
                         grid: _grid,
                         player: _player,
-                        gameInput: Input,
+                        gameInstance: this,
                         movementDirection: movementDirection
                     );
                     cards[i] = new StrategicRetreatCard(retreatCardConfig);

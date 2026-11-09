@@ -1,4 +1,3 @@
-using BaobabEngine.Graphics;
 using BaobabEngine.Collisions;
 using Foster.Framework;
 using System;
@@ -18,7 +17,7 @@ public interface ICard
 
 public class StrategicRetreatCard : ICard
 {
-	private readonly Sprite _sprite;
+	private readonly BundledSprite _sprite;
 	private readonly Vector2 _position;
 
 	private readonly Grid _grid;
@@ -29,21 +28,23 @@ public class StrategicRetreatCard : ICard
 	// Stores the direction the player will be moved.
 	public readonly IntVector2? MovementDirection;
 
+	private SpriteFont _font;
+
 	public readonly struct Config (
-		Sprite sprite,
+		BundledSprite sprite,
 		Vector2 position,
 		Grid grid,
 		Entity player,
-		Input gameInput,
+		Game gameInstance,
 		IntVector2? movementDirection = null		
 	)
 	{
-		public readonly Sprite CardSprite = sprite;
+		public readonly BundledSprite CardSprite = sprite;
 		public readonly Vector2 CardPosition = position;
 		public readonly Grid Grid = grid;
 		public readonly Entity Player = player;
 		public readonly IntVector2? MovementDirection = movementDirection;
-		public readonly Input GameInput = gameInput;
+		public readonly Game GameInstance = gameInstance;
 	}
 
 	public StrategicRetreatCard(Config cardConfig)
@@ -56,12 +57,47 @@ public class StrategicRetreatCard : ICard
 
 		MovementDirection = cardConfig.MovementDirection;
 
-		_gameInput = cardConfig.GameInput;
+		_gameInput = cardConfig.GameInstance.Input;
+
+		_font = new SpriteFont(cardConfig.GameInstance.GraphicsDevice, System.IO.Path.Combine("Assets", "Lorem-Demo.ttf"), 10f);
 	}
 
 	public void Draw(Batcher batcher)
 	{
-		_sprite.Draw(batcher, _position);
+		bool mirrorY = false;
+		
+		// Makes sure the sprite matches the direction
+		if (!(MovementDirection == null))
+		{
+			IntVector2 notNullMovementDirection = (IntVector2)MovementDirection;
+
+			if (notNullMovementDirection.X == 1)
+				mirrorY = true;
+		}
+
+		_sprite.Draw(batcher,
+			frontSpriteArguments: new BundledSprite.DrawArguments(
+				_position,
+				BaobabEngine.Graphics.Sprite.DrawPosition.Centered,
+				mirrorX: false,
+				mirrorY
+			),
+			backSpriteArguments: new BundledSprite.DrawArguments(
+				_position
+			)
+		);
+
+		const string text = "Strategic\n Retreat";
+		var textWidth = _font.WidthOf(text);
+		var textHeight = _font.HeightOf(text);
+
+		_font.DrawWrapped(batcher, text, new Vector2 (
+			_position.X - (textWidth * 0.5f),
+			_position.Y + textHeight
+		),
+		Vector2.Zero,
+		_sprite.BackSprite.Width,
+		Color.Black);
 	}
 
 	public void Action()
@@ -99,7 +135,7 @@ public class StrategicRetreatCard : ICard
 
 	public bool IsClicked()
 	{
-		BoundingBox cardBounds = new BoundingBox(_sprite, _position);
+		BoundingBox cardBounds = new BoundingBox(_sprite.BackSprite, _position);
 
 		Vector2 mousePosition = new(_gameInput.Mouse.X, _gameInput.Mouse.Y);
 		BoundingBox mouseBounds = new(
@@ -114,9 +150,9 @@ public class StrategicRetreatCard : ICard
 
 public class SurpriseAttackCard : ICard
 {
-	public readonly struct Config(Sprite cardSprite, Vector2 cardPosition, Grid grid, Entity player, Game gameInstance)
+	public readonly struct Config(BundledSprite cardSprite, Vector2 cardPosition, Grid grid, Entity player, Game gameInstance)
 	{
-		public readonly Sprite Sprite = cardSprite;
+		public readonly BundledSprite Sprite = cardSprite;
 		public readonly Vector2 Position = cardPosition;
 		public readonly Grid Grid = grid;
 		public readonly Entity Player = player;
@@ -127,10 +163,12 @@ public class SurpriseAttackCard : ICard
 	private readonly Grid _grid;
 	private readonly Entity _player;
 
-	private readonly Sprite _sprite;
+	private readonly BundledSprite _sprite;
 	private readonly Vector2 _position;
 
 	private readonly Game _game;
+
+	private SpriteFont _font;
 
 	public SurpriseAttackCard(Config cardConfig)
 	{
@@ -141,11 +179,32 @@ public class SurpriseAttackCard : ICard
 		_player = cardConfig.Player;
 
 		_game = cardConfig.GameInstance;
+
+		_font = new(_game.GraphicsDevice, System.IO.Path.Combine("Assets", "Lorem-Demo.ttf"), 10f);
 	}
 
 	public void Draw(Batcher batcher)
 	{
-		_sprite.Draw(batcher, _position);
+		_sprite.Draw(batcher,
+			frontSpriteArguments: new BundledSprite.DrawArguments(
+				_position
+			),
+			backSpriteArguments: new BundledSprite.DrawArguments(
+				_position
+			)
+		);
+
+		const string text = "Surprise\nAttack";
+		var textWidth = _font.WidthOf(text);
+		var textHeight = _font.HeightOf(text);
+
+		_font.DrawWrapped(batcher, text, new Vector2(
+			_position.X - (textWidth * 0.5f),
+			_position.Y + textHeight
+		),
+		Vector2.Zero,
+		_sprite.BackSprite.Width,
+		Color.Black);		
 	}		
 
 	// Removes the entity above the player if it exists.
@@ -176,7 +235,7 @@ public class SurpriseAttackCard : ICard
 
 	public bool IsClicked()
 	{
-		BoundingBox cardBounds = new(_sprite, _position);
+		BoundingBox cardBounds = new(_sprite.BackSprite, _position);
 
 		Vector2 mousePosition = new(_game.Input.Mouse.X, _game.Input.Mouse.Y);
 		BoundingBox mouseBounds = new(
