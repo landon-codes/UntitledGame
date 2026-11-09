@@ -68,7 +68,8 @@ public sealed class Game : App
             "SurpriseAttack.aseprite",
             "tempAsset.png",
             "Arrow.png",
-            "Sword.png"
+            "Sword.png",
+            "Odysseus.aseprite"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -80,7 +81,7 @@ public sealed class Game : App
         _font = new SpriteFont(GraphicsDevice, Path.Combine("Assets", "Lorem-Demo.ttf"), 20);
         _gameOverMessageWidth = _font.WidthOf(GameOverMessage);
 
-        Sprite playerSprite = new Sprite(_atlas.GetTexture("tempAsset"), 0.5f);
+        Sprite playerSprite = new Sprite(_atlas.GetTexture("Odysseus"), 4f);
         _player = new Entity(
             playerSprite,
             new Vector2(windowSize.X * 0.5f, windowSize.Y - (playerSprite.Height * 0.5f)),
