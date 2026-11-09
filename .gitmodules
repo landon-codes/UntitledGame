@@ -1,0 +1,3 @@
+[submodule "Foster.Audio"]
+	path = Foster.Audio
+	url = git@github.com:MrBrixican/Foster.Audio.git

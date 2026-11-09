@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Foster.Audio/">
+    <Project Path="Foster.Audio/Foster.Audio/Foster.Audio.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/FP.csproj" />
+  </Folder>
+</Solution>
