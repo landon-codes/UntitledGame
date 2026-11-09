@@ -66,10 +66,12 @@ public sealed class Game : App
             "CardBack.aseprite",
             "StrategicRetreatSprite.aseprite",
             "SurpriseAttack.aseprite",
-            "tempAsset.png",
             "Arrow.png",
             "Sword.png",
-            "Odysseus.aseprite"
+            "Odysseus.aseprite",
+            "Spider.png",
+            "Cyclopse.png",
+            "Octopus.png"
         ]);
 
         _batcher = new Batcher(GraphicsDevice);
@@ -81,7 +83,7 @@ public sealed class Game : App
         _font = new SpriteFont(GraphicsDevice, Path.Combine("Assets", "Lorem-Demo.ttf"), 20);
         _gameOverMessageWidth = _font.WidthOf(GameOverMessage);
 
-        Sprite playerSprite = new Sprite(_atlas.GetTexture("Odysseus"), 4f);
+        Sprite playerSprite = new Sprite(_atlas.GetTexture("Odysseus"), 5f);
         _player = new Entity(
             playerSprite,
             new Vector2(windowSize.X * 0.5f, windowSize.Y - (playerSprite.Height * 0.5f)),
@@ -225,6 +227,12 @@ public sealed class Game : App
     {
         Random random = new Random();
 
+        string[] enemySprites = {
+            "Octopus",
+            "Spider",
+            "Cyclopse"
+        };
+
         while (true)
         {
             var x = random.Next(0, 3);
@@ -235,8 +243,8 @@ public sealed class Game : App
             {
                 Entity enemy = new(
                     new Sprite(
-                        _atlas.GetTexture("tempAsset"),
-                        0.5f
+                        _atlas.GetTexture(enemySprites[random.Next(0, enemySprites.Length)]),
+                        5f
                     ),
                     _grid.GetGlobalPositionFromGrid(entityPosition),
                     1
