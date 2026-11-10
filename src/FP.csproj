@@ -28,5 +28,8 @@
        <Link>Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
      </None>
    </ItemGroup>
+   <ItemGroup>
+     <ProjectReference Include="..\Foster.Audio\Foster.Audio\Foster.Audio.csproj" />
+   </ItemGroup>
   
 </Project>
