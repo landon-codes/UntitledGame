@@ -58,6 +58,7 @@ public sealed class Game : App
     private SoundInstance _musicInstance;
 
     private Sound? _damage;
+    public Sound? _attack;
 
     public Game() : base(new AppConfig
     {
@@ -120,6 +121,7 @@ public sealed class Game : App
         _musicInstance.Play();
 
         _damage = new Sound(Path.Combine("Assets", "Impact.wav"), SoundLoadingMethod.Preload);
+        _attack = new Sound(Path.Combine("Assets", "attack.wav"), SoundLoadingMethod.Preload);
                 
         _grid.SubscribeEntity(_player, new IntVector2(1, 3));
 

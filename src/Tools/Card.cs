@@ -225,6 +225,7 @@ public class SurpriseAttackCard : ICard
 			if (entity is null) return;
 
 			_game.RemoveEntity(entity);					
+			_game._attack?.Play();
 		}
 		catch (System.Collections.Generic.KeyNotFoundException)
 		{
