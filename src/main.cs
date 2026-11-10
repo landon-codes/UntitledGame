@@ -5,6 +5,7 @@ using System.Numerics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Foster.Audio;
 
 Game game = new();
 game.Run();
@@ -52,6 +53,9 @@ public sealed class Game : App
     private readonly Vector2 _windowCenter;
 
     private Sprite _background;
+
+    private Sound? _music;
+    private SoundInstance _musicInstance;
 
     public Game() : base(new AppConfig
     {
@@ -104,6 +108,15 @@ public sealed class Game : App
 
     protected override void Startup()
     {
+        Audio.Startup();
+
+        _music = new Sound(Path.Combine("Assets", "backgroundMusic.ogg"), SoundLoadingMethod.Preload);
+        _musicInstance = _music.CreateInstance();
+        _musicInstance.Looping = true;
+        _musicInstance.Protected = true;
+        _musicInstance.Volume = 1f;
+        _musicInstance.Play();
+        
         _grid.SubscribeEntity(_player, new IntVector2(1, 3));
 
         GenerateEnemy();
@@ -112,11 +125,16 @@ public sealed class Game : App
     
     protected override void Shutdown()
     {
+        _music?.Dispose();
+        Audio.Shutdown();
+        
         Console.WriteLine("The game has closed successfully.");
     }
 
     protected override void Update()
     {
+        Audio.Update();
+        
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
 
