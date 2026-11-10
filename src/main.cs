@@ -5,6 +5,7 @@ using System.Numerics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Foster.Audio;
 
 Game game = new();
 game.Run();
@@ -52,6 +53,12 @@ public sealed class Game : App
     private readonly Vector2 _windowCenter;
 
     private Sprite _background;
+
+    private Sound? _music;
+    private SoundInstance _musicInstance;
+
+    private Sound? _damage;
+    public Sound? _attack;
 
     public Game() : base(new AppConfig
     {
@@ -104,6 +111,18 @@ public sealed class Game : App
 
     protected override void Startup()
     {
+        Audio.Startup();
+
+        _music = new Sound(Path.Combine("Assets", "backgroundMusic.ogg"), SoundLoadingMethod.Stream);
+        _musicInstance = _music.CreateInstance();
+        _musicInstance.Looping = true;
+        _musicInstance.Protected = true;
+        _musicInstance.Volume = 0.5f;
+        _musicInstance.Play();
+
+        _damage = new Sound(Path.Combine("Assets", "Impact.wav"), SoundLoadingMethod.Preload);
+        _attack = new Sound(Path.Combine("Assets", "attack.wav"), SoundLoadingMethod.Preload);
+                
         _grid.SubscribeEntity(_player, new IntVector2(1, 3));
 
         GenerateEnemy();
@@ -112,11 +131,19 @@ public sealed class Game : App
     
     protected override void Shutdown()
     {
+        _atlas.Dispose();
+
+        _music?.Dispose();
+        _damage?.Dispose();
+        Audio.Shutdown();
+        
         Console.WriteLine("The game has closed successfully.");
     }
 
     protected override void Update()
     {
+        Audio.Update();
+        
         if (Input.Keyboard.Pressed(Keys.Escape))
             Exit();
 
@@ -209,7 +236,10 @@ public sealed class Game : App
             bool collidingWithPlayer = (enemyPosition + IntVector2.Down) == playerPosition;
 
             if (collidingWithPlayer)
+            {
                 _player.TakeDamage(1);
+                _damage?.Play();
+            }
 
             if (enemyPosition.Y >= 4 || collidingWithPlayer)
             {
