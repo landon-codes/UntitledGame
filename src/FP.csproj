@@ -30,6 +30,9 @@
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
        <Link>Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
      </None>
+     <None Include="ThirdParty.txt">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="..\Foster.Audio\Foster.Audio\Foster.Audio.csproj" />
