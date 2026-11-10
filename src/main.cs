@@ -57,6 +57,8 @@ public sealed class Game : App
     private Sound? _music;
     private SoundInstance _musicInstance;
 
+    private Sound? _damage;
+
     public Game() : base(new AppConfig
     {
         ApplicationName = "AccEngII Final Project",
@@ -110,13 +112,15 @@ public sealed class Game : App
     {
         Audio.Startup();
 
-        _music = new Sound(Path.Combine("Assets", "backgroundMusic.ogg"), SoundLoadingMethod.Preload);
+        _music = new Sound(Path.Combine("Assets", "backgroundMusic.ogg"), SoundLoadingMethod.Stream);
         _musicInstance = _music.CreateInstance();
         _musicInstance.Looping = true;
         _musicInstance.Protected = true;
-        _musicInstance.Volume = 1f;
+        _musicInstance.Volume = 0.5f;
         _musicInstance.Play();
-        
+
+        _damage = new Sound(Path.Combine("Assets", "Impact.wav"), SoundLoadingMethod.Preload);
+                
         _grid.SubscribeEntity(_player, new IntVector2(1, 3));
 
         GenerateEnemy();
@@ -125,7 +129,10 @@ public sealed class Game : App
     
     protected override void Shutdown()
     {
+        _atlas.Dispose();
+
         _music?.Dispose();
+        _damage?.Dispose();
         Audio.Shutdown();
         
         Console.WriteLine("The game has closed successfully.");
@@ -227,7 +234,10 @@ public sealed class Game : App
             bool collidingWithPlayer = (enemyPosition + IntVector2.Down) == playerPosition;
 
             if (collidingWithPlayer)
+            {
                 _player.TakeDamage(1);
+                _damage?.Play();
+            }
 
             if (enemyPosition.Y >= 4 || collidingWithPlayer)
             {
