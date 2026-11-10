@@ -1,0 +1,14 @@
+https://github.com/FosterFramework/Foster
+MIT License
+
+https://github.com/MrBrixican/Foster.Audio
+MIT License
+
+https://free-game-assets.itch.io/free-mountain-peak-pixel-art-backgrounds
+https://craftpix.net/file-licenses/
+
+https://nikoichu.itch.io/lorem-font
+https://openfontlicense.org/open-font-license-official-text/
+
+https://pixel-boy.itch.io/ninja-adventure-asset-pack
+https://creativecommons.org/publicdomain/zero/1.0/deed.en
